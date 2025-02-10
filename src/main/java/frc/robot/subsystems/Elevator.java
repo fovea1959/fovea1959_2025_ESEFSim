@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj.simulation.PWMSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Elevator extends SubsystemBase {
@@ -78,10 +77,6 @@ public class Elevator extends SubsystemBase {
     m_mech2d.setLength(p);
     SmartDashboard.putNumber("elevator.position", p);
     SmartDashboard.putNumber("elevator.motorOutput", motorOutput);
-  }
-
-  public Command setSetpointCommand(double sp) {
-    return runOnce(() -> setSetpoint(sp));
   }
 
   public void setSetpoint(double sp) {

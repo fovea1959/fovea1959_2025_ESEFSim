@@ -16,31 +16,33 @@ import frc.robot.subsystems.Elevator;
 
 /** This is a sample program to demonstrate the use of elevator simulation. */
 public class Robot extends TimedRobot {
-  /*
+
   private final Elevator m_elevator;
   private final Shoulder m_shoulder;
-  */
 
   private final Mech esefMechanism;
 
   public Robot() {
     esefMechanism = new Mech();
-    /*
-    m_elevator = new Elevator(esefMechanism.elevatorMech2d);
+
+    m_elevator = null; // new Elevator(esefMechanism.elevatorMech2d);
     m_shoulder = new Shoulder(esefMechanism.shoulderMech2d);
 
-    SmartDashboard.putData("e up", m_elevator.setSetpointCommand(1.0));
-    SmartDashboard.putData("e down", m_elevator.setSetpointCommand(1.0));
+    if (m_elevator == null) {
+      SmartDashboard.putData("ee max", Commands.runOnce(() -> esefMechanism.elevatorMech2d.setLength(Constants.kElevatorMaxHeightMeters)));
+      SmartDashboard.putData("ee min", Commands.runOnce(() -> esefMechanism.elevatorMech2d.setLength(Constants.kElevatorMinHeightMeters)));
+    } else {
+      SmartDashboard.putData("ee max", Commands.runOnce(() -> m_elevator.setSetpoint(Constants.kElevatorMaxHeightMeters)));
+      SmartDashboard.putData("ee min", Commands.runOnce(() -> m_elevator.setSetpoint(Constants.kElevatorMinHeightMeters)));
+    }
 
-    SmartDashboard.putData("s up", m_shoulder.setSetpointCommand(Angle.ofRelativeUnits(0.0, Degree)));
-    SmartDashboard.putData("s down", m_shoulder.setSetpointCommand(Angle.ofRelativeUnits(-90.0, Degree)));
-    */
-
-    SmartDashboard.putData("ee max", Commands.runOnce(() -> esefMechanism.elevatorMech2d.setLength(Constants.kElevatorMaxHeightMeters)));
-    SmartDashboard.putData("ee min", Commands.runOnce(() -> esefMechanism.elevatorMech2d.setLength(Constants.kElevatorMinHeightMeters)));
-
-    SmartDashboard.putData("ss 0", Commands.runOnce(() -> esefMechanism.shoulderMech2d.setAngle(0)));
-    SmartDashboard.putData("ss 45", Commands.runOnce(() -> esefMechanism.shoulderMech2d.setAngle(45)));
+    if (m_shoulder == null) {
+      SmartDashboard.putData("ss 0", Commands.runOnce(() -> esefMechanism.shoulderMech2d.setAngle(0)));
+      SmartDashboard.putData("ss 45", Commands.runOnce(() -> esefMechanism.shoulderMech2d.setAngle(45)));
+    } else {
+      SmartDashboard.putData("ss 0", Commands.runOnce(() -> m_shoulder.setSetpoint(Angle.ofRelativeUnits(0.0, Degree))));
+      SmartDashboard.putData("ss 45", Commands.runOnce(() -> m_shoulder.setSetpoint(Angle.ofRelativeUnits(45.0, Degree))));
+    }
   }
 
   @Override

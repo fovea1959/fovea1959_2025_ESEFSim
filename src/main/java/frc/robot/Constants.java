@@ -51,6 +51,6 @@ public class Constants {
   public static final double kShoulderReduction = 200;
   public static final double kShoulderMass = 1.0; // Kilograms
   public static final double kShoulderLength = Units.inchesToMeters(18);
-  public static final double kMinAngleRads = Units.degreesToRadians(-75);
+  public static final double kMinAngleRads = Units.degreesToRadians(-85);
   public static final double kMaxAngleRads = Units.degreesToRadians(255);
 }

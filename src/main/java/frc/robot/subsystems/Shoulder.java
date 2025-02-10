@@ -4,14 +4,13 @@
 
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Radians;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.Constants;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
@@ -20,7 +19,7 @@ import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
-import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Shoulder extends SubsystemBase {
@@ -64,18 +63,27 @@ public class Shoulder extends SubsystemBase {
   }
 
   public void periodic() {
-    var pidOutput = m_controller.calculate(m_encoder.getDistance());
+    double actualRadians = m_encoder.getDistance();
+    var pidOutput = m_controller.calculate(actualRadians);
     m_motor.setVoltage(pidOutput);
+    SmartDashboard.putNumber("shoulder.pidOutput", pidOutput);
+    SmartDashboard.putNumber("shoulder.pidActual", actualRadians);
+    SmartDashboard.putNumber("shoulder.pidSetpoint", m_controller.getSetpoint());
 
-    m_mech2d.setAngle(m_encoder.getDistance());
+    double actualDegrees = Units.radiansToDegrees(actualRadians);
+
+    // Update the Mechanism Arm angle based on the simulated arm angle
+    m_mech2d.setAngle(actualDegrees);
+
+    double simRads = m_shoulderSim.getAngleRads();
+    double simDegrees = Units.radiansToDegrees(simRads);
+    SmartDashboard.putNumber("shoulder.positionDegrees", actualDegrees);
+    SmartDashboard.putNumber("shoulder.simRadians", simRads);
+    SmartDashboard.putNumber("shoulder.simDegrees", simDegrees);
   }
 
-  public Command setSetpointCommand(Angle sp) {
-    return runOnce(() -> setSetpoint(sp));
-  }
-
-  void setSetpoint(Angle angle) {
-    m_controller.setSetpoint(angle.in(Degrees));
+  public void setSetpoint(Angle angle) {
+    m_controller.setSetpoint(angle.in(Radians));
   }
 
   /** Update the simulation model. */
@@ -93,8 +101,7 @@ public class Shoulder extends SubsystemBase {
     RoboRioSim.setVInVoltage(
         BatterySim.calculateDefaultBatteryLoadedVoltage(m_shoulderSim.getCurrentDrawAmps()));
 
-    // Update the Mechanism Arm angle based on the simulated arm angle
-    m_mech2d.setAngle(Units.radiansToDegrees(m_shoulderSim.getAngleRads()));
+
   }
 
   /** Load setpoint and kP from preferences. */
