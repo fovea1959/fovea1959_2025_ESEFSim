@@ -4,10 +4,13 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
@@ -83,7 +86,7 @@ public class Elevator extends SubsystemBase {
     }
 
     m_mech2d.setLength(p);
-    SmartDashboard.putNumber("elevator.pidActual", p);
+    SmartDashboard.putNumber("elevator.actual", p);
     SmartDashboard.putNumber("elevator.pidSetpoint", m_controller.getSetpoint().position);
     SmartDashboard.putNumber("elevator.pidOutput", pidOutput);
     SmartDashboard.putNumber("elevator.motorOutput", motorOutput);
@@ -92,6 +95,10 @@ public class Elevator extends SubsystemBase {
 
   public void setSetpoint(double sp) {
     m_controller.setGoal(sp);
+  }
+
+  public Distance getCurrentHeight() {
+    return Meters.of(m_encoder.getDistance());
   }
 
   /** Advance the simulation. */

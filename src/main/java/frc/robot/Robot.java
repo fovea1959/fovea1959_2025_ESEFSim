@@ -5,8 +5,13 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Degree;
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
 
+import dev.doglog.DogLog;
+import dev.doglog.DogLogOptions;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -20,37 +25,57 @@ public class Robot extends TimedRobot {
   private final Elevator m_elevator;
   private final Shoulder m_shoulder;
 
+  private final ESEFPositionMechanisms esefPositionMechanisms;
+  private final ESEFPositionController esefPositionController;
+
   private final Mech esefMechanism;
 
   public Robot() {
+    DogLog.setOptions(new DogLogOptions().withCaptureNt(true));
     esefMechanism = new Mech();
 
     m_elevator = new Elevator(esefMechanism.elevatorMech2d);
     m_shoulder = new Shoulder(esefMechanism.shoulderMech2d);
 
-    if (m_elevator == null) {
-      SmartDashboard.putData("ee max", Commands.runOnce(() -> esefMechanism.elevatorMech2d.setLength(Constants.kElevatorMaxHeightMeters)));
-      SmartDashboard.putData("ee min", Commands.runOnce(() -> esefMechanism.elevatorMech2d.setLength(Constants.kElevatorMinHeightMeters)));
-    } else {
-      SmartDashboard.putData("ee max", Commands.runOnce(() -> m_elevator.setSetpoint(Constants.kElevatorMaxHeightMeters)));
-      SmartDashboard.putData("ee min", Commands.runOnce(() -> m_elevator.setSetpoint(Constants.kElevatorMinHeightMeters)));
-    }
+    esefPositionMechanisms = new ESEFPositionMechanisms() {
 
-    if (m_shoulder == null) {
-      SmartDashboard.putData("ss 0", Commands.runOnce(() -> esefMechanism.shoulderMech2d.setAngle(0)));
-      SmartDashboard.putData("ss 45", Commands.runOnce(() -> esefMechanism.shoulderMech2d.setAngle(45)));
-      SmartDashboard.putData("ss 135", Commands.runOnce(() -> esefMechanism.shoulderMech2d.setAngle(135)));
-    } else {
-      SmartDashboard.putData("ss 0", Commands.runOnce(() -> m_shoulder.setSetpoint(Angle.ofRelativeUnits(0.0, Degree))));
-      SmartDashboard.putData("ss 45", Commands.runOnce(() -> m_shoulder.setSetpoint(Angle.ofRelativeUnits(45.0, Degree))));
-      SmartDashboard.putData("ss 135", Commands.runOnce(() -> m_shoulder.setSetpoint(Angle.ofRelativeUnits(135.0, Degree))));
-    }
+      @Override
+      public void setElevatorHeightSetpoint(Distance height) {
+        m_elevator.setSetpoint(height.in(Meters));
+      }
+
+      @Override
+      public Distance getElevatorHeight() {
+        return m_elevator.getCurrentHeight();
+      }
+
+      @Override
+      public void setShoulderAngleSetpoint(Angle angle) {
+        m_shoulder.setSetpoint(angle);
+      }
+
+      @Override
+      public Angle getShoulderAngle() {
+        return m_shoulder.getCurrentAngle();
+      }
+      
+    };
+
+    esefPositionController = new ESEFPositionController(esefPositionMechanisms);
+
+    SmartDashboard.putData("pos 1.5+0", Commands.runOnce(() -> esefPositionController.setPosition(new ESEFPosition(Meters.of(1.5), Degrees.of(0)))));
+    SmartDashboard.putData("pos 2.0+135", Commands.runOnce(() -> esefPositionController.setPosition(new ESEFPosition(Meters.of(2.0), Degrees.of(135)))));
+
+    SmartDashboard.putData("e +0.1", Commands.runOnce(() -> esefPositionController.bumpElevatorHeight(Meters.of(0.1))));
+    SmartDashboard.putData("e -0.1", Commands.runOnce(() -> esefPositionController.bumpElevatorHeight(Meters.of(-0.1))));
+    SmartDashboard.putData("s +5.0", Commands.runOnce(() -> esefPositionController.bumpShoulderAngle(Degrees.of(5))));
+    SmartDashboard.putData("s -5.0", Commands.runOnce(() -> esefPositionController.bumpShoulderAngle(Degrees.of(-5))));
+
   }
 
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-
-    SmartDashboard.putNumber("mech.elevator.length", esefMechanism.elevatorMech2d.getLength());
+    esefPositionController.periodic();
   }
 }

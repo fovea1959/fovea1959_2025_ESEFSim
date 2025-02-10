@@ -77,7 +77,8 @@ public class Shoulder extends SubsystemBase {
 
     double actualDegrees = Units.radiansToDegrees(actualRadians);
 
-    // Update the Mechanism Arm angle based on the simulated arm angle
+    // Update the Mechanism Arm angle based on the simulated arm angle. We need to adjust because we 
+    // attached the shoulder to a ligament that was oriented at 90 degrees.
     m_mech2d.setAngle(actualDegrees - 90);
 
     double simRads = m_shoulderSim.getAngleRads();
@@ -89,6 +90,10 @@ public class Shoulder extends SubsystemBase {
 
   public void setSetpoint(Angle angle) {
     m_controller.setSetpoint(angle.in(Radians));
+  }
+
+  public Angle getCurrentAngle() {
+    return Radians.of(m_shoulderSim.getAngleRads());
   }
 
   /** Update the simulation model. */
