@@ -39,9 +39,11 @@ public class Robot extends TimedRobot {
     if (m_shoulder == null) {
       SmartDashboard.putData("ss 0", Commands.runOnce(() -> esefMechanism.shoulderMech2d.setAngle(0)));
       SmartDashboard.putData("ss 45", Commands.runOnce(() -> esefMechanism.shoulderMech2d.setAngle(45)));
+      SmartDashboard.putData("ss 135", Commands.runOnce(() -> esefMechanism.shoulderMech2d.setAngle(135)));
     } else {
       SmartDashboard.putData("ss 0", Commands.runOnce(() -> m_shoulder.setSetpoint(Angle.ofRelativeUnits(0.0, Degree))));
       SmartDashboard.putData("ss 45", Commands.runOnce(() -> m_shoulder.setSetpoint(Angle.ofRelativeUnits(45.0, Degree))));
+      SmartDashboard.putData("ss 135", Commands.runOnce(() -> m_shoulder.setSetpoint(Angle.ofRelativeUnits(135.0, Degree))));
     }
   }
 

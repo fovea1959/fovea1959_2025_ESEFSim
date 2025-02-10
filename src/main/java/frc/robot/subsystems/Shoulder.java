@@ -78,7 +78,7 @@ public class Shoulder extends SubsystemBase {
     double actualDegrees = Units.radiansToDegrees(actualRadians);
 
     // Update the Mechanism Arm angle based on the simulated arm angle
-    m_mech2d.setAngle(actualDegrees);
+    m_mech2d.setAngle(actualDegrees - 90);
 
     double simRads = m_shoulderSim.getAngleRads();
     double simDegrees = Units.radiansToDegrees(simRads);
