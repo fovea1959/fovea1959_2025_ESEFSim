@@ -25,7 +25,7 @@ public class Robot extends TimedRobot {
   public Robot() {
     esefMechanism = new Mech();
 
-    m_elevator = null; // new Elevator(esefMechanism.elevatorMech2d);
+    m_elevator = new Elevator(esefMechanism.elevatorMech2d);
     m_shoulder = new Shoulder(esefMechanism.shoulderMech2d);
 
     if (m_elevator == null) {
@@ -50,14 +50,5 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
 
     SmartDashboard.putNumber("mech.elevator.length", esefMechanism.elevatorMech2d.getLength());
-  }
-
-  @Override
-  public void disabledInit() {
-    /*
-    // This just makes sure that our simulation code knows that the motor's off.
-    m_shoulder.stop();
-    m_elevator.stop();
-    */
   }
 }

@@ -10,6 +10,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.Constants;
@@ -65,7 +66,11 @@ public class Shoulder extends SubsystemBase {
   public void periodic() {
     double actualRadians = m_encoder.getDistance();
     var pidOutput = m_controller.calculate(actualRadians);
-    m_motor.setVoltage(pidOutput);
+    if (DriverStation.isEnabled()) {
+      m_motor.setVoltage(pidOutput);
+    } else {
+      m_motor.stopMotor();
+    }
     SmartDashboard.putNumber("shoulder.pidOutput", pidOutput);
     SmartDashboard.putNumber("shoulder.pidActual", actualRadians);
     SmartDashboard.putNumber("shoulder.pidSetpoint", m_controller.getSetpoint());
@@ -102,10 +107,5 @@ public class Shoulder extends SubsystemBase {
         BatterySim.calculateDefaultBatteryLoadedVoltage(m_shoulderSim.getCurrentDrawAmps()));
 
 
-  }
-
-  /** Load setpoint and kP from preferences. */
-  public void stop() {
-    m_motor.set(0.0);
   }
 }

@@ -8,6 +8,7 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.Constants;
@@ -52,7 +53,7 @@ public class Elevator extends SubsystemBase {
           Constants.kElevatorMinHeightMeters,
           Constants.kElevatorMaxHeightMeters,
           true,
-          0,
+          Constants.kElevatorMinHeightMeters,
           0.01,
           0.0);
   private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
@@ -65,6 +66,8 @@ public class Elevator extends SubsystemBase {
     m_mech2d = mech2d;
 
     m_encoder.setDistancePerPulse(Constants.kElevatorEncoderDistPerPulse);
+
+    m_controller.setGoal(Constants.kElevatorMinHeightMeters);
   }
 
   public void periodic() {
@@ -72,11 +75,19 @@ public class Elevator extends SubsystemBase {
     double pidOutput = m_controller.calculate(p);
     double feedforwardOutput = m_feedforward.calculate(m_controller.getSetpoint().velocity);
     double motorOutput = pidOutput + feedforwardOutput;
-    m_motor.setVoltage(motorOutput);
+
+    if (DriverStation.isEnabled()) {
+      m_motor.setVoltage(motorOutput);
+    } else {
+      m_motor.stopMotor();
+    }
 
     m_mech2d.setLength(p);
-    SmartDashboard.putNumber("elevator.position", p);
+    SmartDashboard.putNumber("elevator.pidActual", p);
+    SmartDashboard.putNumber("elevator.pidSetpoint", m_controller.getSetpoint().position);
+    SmartDashboard.putNumber("elevator.pidOutput", pidOutput);
     SmartDashboard.putNumber("elevator.motorOutput", motorOutput);
+    SmartDashboard.putString("elevator.goal", m_controller.getSetpoint().toString());
   }
 
   public void setSetpoint(double sp) {
@@ -98,11 +109,5 @@ public class Elevator extends SubsystemBase {
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(
         BatterySim.calculateDefaultBatteryLoadedVoltage(m_elevatorSim.getCurrentDrawAmps()));
-  }
-
-  /** Stop the control loop and motor output. */
-  public void stop() {
-    m_controller.setGoal(0.0);
-    m_motor.set(0.0);
   }
 }
