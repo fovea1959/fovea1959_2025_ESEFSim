@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems;
+package frc.robot.subsystems.esefsubsystem;
 
 import static edu.wpi.first.units.Units.Meters;
 
@@ -14,18 +14,16 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
-import frc.robot.Constants;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.PWMSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Elevator extends SubsystemBase {
+public class ESEFElevatorMechanism extends SubsystemBase {
   // This gearbox represents a gearbox containing 4 Vex 775pro motors.
   private final DCMotor m_elevatorGearbox = DCMotor.getVex775Pro(4);
 
@@ -62,12 +60,8 @@ public class Elevator extends SubsystemBase {
   private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
   private final PWMSim m_motorSim = new PWMSim(m_motor);
 
-  private final MechanismLigament2d m_mech2d;
-
   /** Subsystem constructor. */
-  public Elevator(MechanismLigament2d mech2d) {
-    m_mech2d = mech2d;
-
+  public ESEFElevatorMechanism() {
     m_encoder.setDistancePerPulse(Constants.kElevatorEncoderDistPerPulse);
 
     m_controller.setGoal(Constants.kElevatorMinHeightMeters);
@@ -85,7 +79,6 @@ public class Elevator extends SubsystemBase {
       m_motor.stopMotor();
     }
 
-    m_mech2d.setLength(p);
     SmartDashboard.putNumber("elevator.actual", p);
     SmartDashboard.putNumber("elevator.pidSetpoint", m_controller.getSetpoint().position);
     SmartDashboard.putNumber("elevator.pidOutput", pidOutput);
@@ -93,8 +86,8 @@ public class Elevator extends SubsystemBase {
     SmartDashboard.putString("elevator.goal", m_controller.getSetpoint().toString());
   }
 
-  public void setSetpoint(double sp) {
-    m_controller.setGoal(sp);
+  public void setSetpoint(Distance height) {
+    m_controller.setGoal(height.in(Meters));
   }
 
   public Distance getCurrentHeight() {
@@ -113,6 +106,7 @@ public class Elevator extends SubsystemBase {
 
     // Finally, we set our simulated encoder's readings and simulated battery voltage
     m_encoderSim.setDistance(m_elevatorSim.getPositionMeters());
+
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(
         BatterySim.calculateDefaultBatteryLoadedVoltage(m_elevatorSim.getCurrentDrawAmps()));

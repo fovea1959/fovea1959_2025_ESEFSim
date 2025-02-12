@@ -2,13 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot;
+package frc.robot.subsystems.esefsubsystem;
 
 import edu.wpi.first.math.util.Units;
 
 public class Constants {
-  public static final int kJoystickPort = 0;
-
   public static final int kElevatorMotorPort = 0;
   public static final int kElevatorEncoderAChannel = 0;
   public static final int kElevatorEncoderBChannel = 1;
@@ -26,8 +24,6 @@ public class Constants {
   public static final double kElevatorDrumRadius = Units.inchesToMeters(2.0);
   public static final double kCarriageMass = 1.0; // kg
 
-  public static final double kSetpointMeters = 0.75;
-  // Encoder is reset to measure 0 at the bottom, so minimum height is 0.
   public static final double kElevatorMinHeightMeters = 1.0;
   public static final double kElevatorMaxHeightMeters = 2.0;
 

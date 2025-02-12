@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems;
+package frc.robot.subsystems.esefsubsystem;
 
 import static edu.wpi.first.units.Units.Radians;
 
@@ -13,17 +13,15 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
-import frc.robot.Constants;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Shoulder extends SubsystemBase {
+public class ESEFShoulderMechanism extends SubsystemBase {
   // The P gain for the PID controller that drives this arm.
   private double m_shoulderKp = Constants.kShoulderDefaultKp;
 
@@ -54,12 +52,8 @@ public class Shoulder extends SubsystemBase {
           );
   private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
 
-  // Create a Mechanism2d display of an Arm with a fixed ArmTower and moving Arm.
-  private final MechanismLigament2d m_mech2d;
-
   /** Subsystem constructor. */
-  public Shoulder(MechanismLigament2d mech2d) {
-    m_mech2d = mech2d;
+  public ESEFShoulderMechanism() {
     m_encoder.setDistancePerPulse(Constants.kShoulderEncoderDistPerPulse);
   }
 
@@ -76,10 +70,6 @@ public class Shoulder extends SubsystemBase {
     SmartDashboard.putNumber("shoulder.pidSetpoint", m_controller.getSetpoint());
 
     double actualDegrees = Units.radiansToDegrees(actualRadians);
-
-    // Update the Mechanism Arm angle based on the simulated arm angle. We need to adjust because we 
-    // attached the shoulder to a ligament that was oriented at 90 degrees.
-    m_mech2d.setAngle(actualDegrees - 90);
 
     double simRads = m_shoulderSim.getAngleRads();
     double simDegrees = Units.radiansToDegrees(simRads);
