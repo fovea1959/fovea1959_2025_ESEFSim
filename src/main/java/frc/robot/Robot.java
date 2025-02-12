@@ -7,6 +7,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Radians;
 
 import dev.doglog.DogLog;
 import dev.doglog.DogLogOptions;
@@ -16,6 +17,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.subsystems.esefsubsystem.Constants;
 import frc.robot.subsystems.esefsubsystem.ESEFElevatorMechanism;
 import frc.robot.subsystems.esefsubsystem.ESEFPosition;
 import frc.robot.subsystems.esefsubsystem.ESEFPositionController;
@@ -37,6 +39,9 @@ public class Robot extends TimedRobot {
 
     esefPositionController = new ESEFPositionController(m_elevator, m_shoulder);
 
+    ESEFPosition initialPosition = new ESEFPosition(Meters.of(Constants.kElevatorMinHeightMeters), Radians.of(Constants.kMinAngleRads));
+    esefPositionController.setPosition(initialPosition);
+
     SmartDashboard.putData("pos 1.5+0", Commands.runOnce(() -> esefPositionController.setPosition(new ESEFPosition(Meters.of(1.5), Degrees.of(0)))));
     SmartDashboard.putData("pos 2.0+135", Commands.runOnce(() -> esefPositionController.setPosition(new ESEFPosition(Meters.of(2.0), Degrees.of(135)))));
 
@@ -51,4 +56,8 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
     esefPositionController.periodic();
   }
+
+  // get rid of "Default xxxxxxx method... Override me!" messages
+  @Override public void disabledPeriodic() { }
+  @Override public void simulationPeriodic() { }
 }

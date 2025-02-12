@@ -55,6 +55,7 @@ public class ESEFShoulderMechanism extends SubsystemBase {
   /** Subsystem constructor. */
   public ESEFShoulderMechanism() {
     m_encoder.setDistancePerPulse(Constants.kShoulderEncoderDistPerPulse);
+    simulationPeriodic();
   }
 
   public void periodic() {
@@ -100,7 +101,5 @@ public class ESEFShoulderMechanism extends SubsystemBase {
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(
         BatterySim.calculateDefaultBatteryLoadedVoltage(m_shoulderSim.getCurrentDrawAmps()));
-
-
   }
 }

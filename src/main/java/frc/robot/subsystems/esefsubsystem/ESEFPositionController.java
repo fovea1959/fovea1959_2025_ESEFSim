@@ -28,14 +28,9 @@ public class ESEFPositionController {
     SmartDashboard.putData("frc3620/ESEF/setpointMech", ultimateSetpointMech.getMech());
     SmartDashboard.putData("frc3620/ESEF/intermediateSetpointMech", intermediateSetpointMech.getMech());
     SmartDashboard.putData("frc3620/ESEF/actualPositionMech", actualPositionMech.getMech());
-
-    setPosition(new ESEFPosition(elevatorMechanism.getCurrentHeight(), shoulderMechanism.getCurrentAngle()));
-    setElevatorHeightSetpoint(elevatorMechanism.getCurrentHeight());
-    setShoulderAngleSetpoint(shoulderMechanism.getCurrentAngle());
   }
 
   public void setPosition (ESEFPosition position) {
-    System.out.println ("setting position: " + position);
     ultimateSetpoint = position;
     ultimateSetpointMech.setShoulderAngle(ultimateSetpoint.shoulderAngle);
     ultimateSetpointMech.setElevatorHeight(ultimateSetpoint.elevatorHeight);

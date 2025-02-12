@@ -65,6 +65,9 @@ public class ESEFElevatorMechanism extends SubsystemBase {
     m_encoder.setDistancePerPulse(Constants.kElevatorEncoderDistPerPulse);
 
     m_controller.setGoal(Constants.kElevatorMinHeightMeters);
+    System.out.println ("elevation before = " + getCurrentHeight());
+    m_encoderSim.setDistance(m_elevatorSim.getPositionMeters());
+    System.out.println ("elevation after  = " + getCurrentHeight());
   }
 
   public void periodic() {
