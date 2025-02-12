@@ -6,6 +6,7 @@ package frc.robot.subsystems.esefsubsystem;
 
 import static edu.wpi.first.units.Units.Meters;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -77,6 +78,7 @@ public class ESEFElevatorMechanism extends SubsystemBase {
     double motorOutput = pidOutput + feedforwardOutput;
 
     if (DriverStation.isEnabled()) {
+      motorOutput = MathUtil.clamp(motorOutput, -3, 3);
       m_motor.setVoltage(motorOutput);
     } else {
       m_motor.stopMotor();

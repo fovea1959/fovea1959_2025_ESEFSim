@@ -6,6 +6,7 @@ package frc.robot.subsystems.esefsubsystem;
 
 import static edu.wpi.first.units.Units.Radians;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
@@ -62,6 +63,7 @@ public class ESEFShoulderMechanism extends SubsystemBase {
     double actualRadians = m_encoder.getDistance();
     var pidOutput = m_controller.calculate(actualRadians);
     if (DriverStation.isEnabled()) {
+      pidOutput = MathUtil.clamp(pidOutput, -2.0, 2.0);
       m_motor.setVoltage(pidOutput);
     } else {
       m_motor.stopMotor();

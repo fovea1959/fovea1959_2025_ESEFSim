@@ -1,5 +1,9 @@
 package frc.robot.subsystems.esefsubsystem;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -19,44 +23,71 @@ public class ESEFPositionController {
   ESEFMech intermediateSetpointMech = new ESEFMech();
   ESEFMech actualPositionMech = new ESEFMech();
 
+  double height_breakpoint_in_meters = 0.5;
+
   public ESEFPositionController(ESEFElevatorMechanism elevatorMechanism, ESEFShoulderMechanism shoulderMechanism) {
     this.elevatorMechanism = elevatorMechanism;
     this.shoulderMechanism = shoulderMechanism;
 
-    intermediateSetpoint = new ESEFPosition();
+    intermediateSetpoint = new ESEFPosition(Meters.of(0), Degrees.of(0));
 
     SmartDashboard.putData("frc3620/ESEF/setpointMech", ultimateSetpointMech.getMech());
     SmartDashboard.putData("frc3620/ESEF/intermediateSetpointMech", intermediateSetpointMech.getMech());
     SmartDashboard.putData("frc3620/ESEF/actualPositionMech", actualPositionMech.getMech());
   }
 
+  ESEFPosition limitedESEFPosition(Distance d, Angle a) {
+    double d_meters = d.in(Meters);
+    double a_degrees = a.in(Degrees);
+    if (d_meters < height_breakpoint_in_meters) {
+      a_degrees = MathUtil.clamp(a_degrees, 80, 100);
+    }
+    d_meters = MathUtil.clamp(d_meters, 0, 2);
+    return new ESEFPosition(Meters.of(d_meters), Degrees.of(a_degrees));
+  }
+
+  void updateDashboardForUltimate() {
+    SmartDashboard.putNumber("frc3620/ESEF/ultimate.e", ultimateSetpoint.elevatorHeight.in(Meters));
+    SmartDashboard.putNumber("frc3620/ESEF/ultimate.s", ultimateSetpoint.shoulderAngle.in(Degrees));
+  }
+
+  void updateDashboardForIntermediate() {
+    SmartDashboard.putNumber("frc3620/ESEF/intermediate.e", intermediateSetpoint.elevatorHeight.in(Meters));
+    SmartDashboard.putNumber("frc3620/ESEF/intermediate.s", intermediateSetpoint.shoulderAngle.in(Degrees));
+  }
+
   public void setPosition (ESEFPosition position) {
-    ultimateSetpoint = position;
+    ultimateSetpoint = limitedESEFPosition(position.elevatorHeight, position.shoulderAngle);
+    updateDashboardForUltimate();
     ultimateSetpointMech.setShoulderAngle(ultimateSetpoint.shoulderAngle);
     ultimateSetpointMech.setElevatorHeight(ultimateSetpoint.elevatorHeight);
     recalculate();
   }
 
   public void bumpElevatorHeight(Distance delta) {
-    ultimateSetpoint.elevatorHeight = ultimateSetpoint.elevatorHeight.plus(delta);
+    ultimateSetpoint = limitedESEFPosition(ultimateSetpoint.elevatorHeight.plus(delta), ultimateSetpoint.shoulderAngle);
+    updateDashboardForUltimate();
     ultimateSetpointMech.setElevatorHeight(ultimateSetpoint.elevatorHeight);
     recalculate();
   }
 
   public void bumpShoulderAngle(Angle delta) {
-    ultimateSetpoint.shoulderAngle = ultimateSetpoint.shoulderAngle.plus(delta);
+    ultimateSetpoint = limitedESEFPosition(ultimateSetpoint.elevatorHeight, ultimateSetpoint.shoulderAngle.plus(delta));
+    updateDashboardForUltimate();
     ultimateSetpointMech.setShoulderAngle(ultimateSetpoint.shoulderAngle);
     recalculate();
   }
 
   void setElevatorHeightSetpoint(Distance d) {
-    intermediateSetpoint.elevatorHeight = d;
+    intermediateSetpoint = new ESEFPosition(d, intermediateSetpoint.shoulderAngle);
+    updateDashboardForIntermediate();
     elevatorMechanism.setSetpoint(d);
     intermediateSetpointMech.setElevatorHeight(d);
   }
 
   void setShoulderAngleSetpoint(Angle a) {
-    intermediateSetpoint.shoulderAngle = a;
+    intermediateSetpoint = new ESEFPosition(intermediateSetpoint.elevatorHeight, a);
+    updateDashboardForIntermediate();
     shoulderMechanism.setSetpoint(a);
     intermediateSetpointMech.setShoulderAngle(a);
   }
@@ -64,6 +95,9 @@ public class ESEFPositionController {
   public void periodic() {
     Distance currentHeight = elevatorMechanism.getCurrentHeight();
     Angle currentShoulderAngle = shoulderMechanism.getCurrentAngle();
+    SmartDashboard.putNumber("frc3620/ESEF/actual.e", currentHeight.in(Meters));
+    SmartDashboard.putNumber("frc3620/ESEF/actual.s", currentShoulderAngle.in(Degrees));
+
     actualPositionMech.setElevatorHeight(currentHeight);
     actualPositionMech.setShoulderAngle(currentShoulderAngle);
     tweakIntermediateSetpoints(currentHeight, currentShoulderAngle);

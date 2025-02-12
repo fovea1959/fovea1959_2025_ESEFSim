@@ -1,19 +1,11 @@
 package frc.robot.subsystems.esefsubsystem;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Meters;
-
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 
 public class ESEFPosition {
-  Distance elevatorHeight;
-  Angle shoulderAngle;
-
-  public ESEFPosition() {
-    elevatorHeight = Meters.of(0);
-    shoulderAngle = Degrees.of(0);
-  }
+  final Distance elevatorHeight;
+  final Angle shoulderAngle;
 
   public ESEFPosition(Distance elevatorHeight, Angle shoulderAngle) {
     this.elevatorHeight = elevatorHeight;
@@ -29,7 +21,7 @@ public class ESEFPosition {
   }
 
   public String toString() {
-    return super.toString() + " " + elevatorHeight + shoulderAngle;
+    return elevatorHeight + "m, " + shoulderAngle + "d";
   }
 
 }

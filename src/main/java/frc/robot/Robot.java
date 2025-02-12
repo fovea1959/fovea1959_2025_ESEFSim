@@ -39,9 +39,11 @@ public class Robot extends TimedRobot {
 
     esefPositionController = new ESEFPositionController(m_elevator, m_shoulder);
 
-    ESEFPosition initialPosition = new ESEFPosition(Meters.of(Constants.kElevatorMinHeightMeters), Radians.of(Constants.kMinAngleRads));
+    ESEFPosition initialPosition = new ESEFPosition(Meters.of(0), Degrees.of(90));
     esefPositionController.setPosition(initialPosition);
 
+    SmartDashboard.putData("pos 0+90", Commands.runOnce(() -> esefPositionController.setPosition(new ESEFPosition(Meters.of(0), Degrees.of(90)))));
+    SmartDashboard.putData("pos 0.8-20", Commands.runOnce(() -> esefPositionController.setPosition(new ESEFPosition(Meters.of(0.8), Degrees.of(-20)))));
     SmartDashboard.putData("pos 1.5+0", Commands.runOnce(() -> esefPositionController.setPosition(new ESEFPosition(Meters.of(1.5), Degrees.of(0)))));
     SmartDashboard.putData("pos 2.0+135", Commands.runOnce(() -> esefPositionController.setPosition(new ESEFPosition(Meters.of(2.0), Degrees.of(135)))));
 
@@ -58,6 +60,7 @@ public class Robot extends TimedRobot {
   }
 
   // get rid of "Default xxxxxxx method... Override me!" messages
+  @Override public void teleopPeriodic() { }
   @Override public void disabledPeriodic() { }
   @Override public void simulationPeriodic() { }
 }

@@ -24,7 +24,7 @@ public class Constants {
   public static final double kElevatorDrumRadius = Units.inchesToMeters(2.0);
   public static final double kCarriageMass = 1.0; // kg
 
-  public static final double kElevatorMinHeightMeters = 1.0;
+  public static final double kElevatorMinHeightMeters = 0.0;
   public static final double kElevatorMaxHeightMeters = 2.0;
 
   // distance per pulse = (distance per revolution) / (pulses per revolution)
